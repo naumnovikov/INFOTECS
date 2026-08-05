@@ -2,6 +2,8 @@
 #define I_LOGGER_HPP
 
 #include <string_view>
+#include <iostream>
+#include <time.h>
 
 namespace logging{
     enum class LogLevel{
@@ -31,7 +33,6 @@ namespace logging{
             }
             virtual inline void setLevel(LogLevel lvl) = 0;
             virtual void log(std::string_view msg, LogLevel lvl) = 0;
-            virtual void close() = 0;
 
             ILogger(ILogger const&) = delete;
             ILogger& operator= (ILogger const&) = delete;

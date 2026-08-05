@@ -69,3 +69,4 @@ Testing/
 
 # other 
 .DS_Store
+.vscode

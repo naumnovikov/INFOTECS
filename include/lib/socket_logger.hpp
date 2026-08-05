@@ -4,12 +4,15 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include <optional>
+#include <cstdint>
 #include "i_logger.hpp"
 
 namespace logging{
     using FdType = int;
-    using PortType = uint16_t;
+    using PortType = std::uint16_t;
+    using IpType = std::uint32_t;
 
     class SocketLogger : public ILogger<SocketLogger>{
         public:
@@ -21,14 +24,19 @@ namespace logging{
                 current_log_lvl = lvl;
             }
             void log(std::string_view msg, LogLevel lvl) override;
-            void close() override {
-                // закрытие fd
+
+            //Don't forget to close socket
+            void closeSocket() {
+                if (fd_opt.has_value()){
+                    close(fd_opt.value());
+                    fd_opt.reset();
+                }
             }
         private:
             LogLevel current_log_lvl = LogLevel::DEBUG;
             std::optional<FdType> fd_opt;
 
-            SocketLogger(PortType port);
+            SocketLogger(IpType ip, PortType port, LogLevel default_level);
 
             SocketLogger() = default;
             ~SocketLogger() = default;

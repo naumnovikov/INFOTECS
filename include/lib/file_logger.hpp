@@ -15,7 +15,9 @@ namespace logging{
                 current_log_lvl = lvl;
             }
             void log(std::string_view msg, LogLevel lvl) override;
-            void close() override {
+
+            //Don't forget to close file
+            void closeFile() {
                 if (f_out_opt.is_open()) {
                     f_out_opt.close();
                 }
@@ -24,7 +26,7 @@ namespace logging{
             LogLevel current_log_lvl = LogLevel::DEBUG;
             std::ofstream f_out_opt;
 
-            FileLogger(std::string_view filename);
+            FileLogger(std::string_view filename, LogLevel default_level);
 
             FileLogger() = default;
             ~FileLogger() = default;
