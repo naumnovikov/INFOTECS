@@ -3,7 +3,9 @@
 
 #include <string_view>
 #include <iostream>
-#include <time.h>
+#include <ctime>
+#include <atomic>
+#include <mutex>
 
 namespace logging{
     enum class LogLevel{

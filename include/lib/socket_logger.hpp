@@ -33,8 +33,9 @@ namespace logging{
                 }
             }
         private:
-            LogLevel current_log_lvl = LogLevel::DEBUG;
+            std::atomic<LogLevel> current_log_lvl = LogLevel::DEBUG;
             std::optional<FdType> fd_opt;
+            std::mutex mtx;
 
             SocketLogger(IpType ip, PortType port, LogLevel default_level);
 

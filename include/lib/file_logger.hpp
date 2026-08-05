@@ -18,13 +18,14 @@ namespace logging{
 
             //Don't forget to close file
             void closeFile() {
-                if (f_out_opt.is_open()) {
-                    f_out_opt.close();
+                if (f_out.is_open()) {
+                    f_out.close();
                 }
             }
         private:
-            LogLevel current_log_lvl = LogLevel::DEBUG;
-            std::ofstream f_out_opt;
+            std::atomic<LogLevel> current_log_lvl = LogLevel::DEBUG;
+            std::ofstream f_out;
+            std::mutex mtx;
 
             FileLogger(std::string_view filename, LogLevel default_level);
 

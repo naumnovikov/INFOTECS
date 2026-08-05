@@ -1,6 +1,5 @@
 #include "socket_logger.hpp"
 #include <vector>
-#include <ctime>
 
 namespace logging{
     inline constexpr int TCP_VALUE = 0;
@@ -43,15 +42,16 @@ namespace logging{
     };
     #pragma pack(pop)
 
-    void setLocalTime(MsgHeader& header){
+    void setLocalTime(MsgHeader& header) {
         std::time_t t = std::time(nullptr);
-        std::tm* local_time = std::localtime(&t); 
-        header.day = local_time->tm_mday;      
-        header.month = local_time->tm_mon + MONTH_SHIFT;
-        header.year = htons(local_time->tm_year + YEAR_SHIFT); 
-        header.hour = local_time->tm_hour;        
-        header.min = local_time->tm_min;         
-        header.sec = local_time->tm_sec;
+        std::tm local_time; 
+        localtime_r(&t, &local_time); 
+        header.day = local_time.tm_mday;      
+        header.month = local_time.tm_mon + MONTH_SHIFT;
+        header.year = htons(local_time.tm_year + YEAR_SHIFT); 
+        header.hour = local_time.tm_hour;        
+        header.min = local_time.tm_min;         
+        header.sec = local_time.tm_sec;
     }
     void fillMsgHeader(MsgHeader& header, std::size_t msg_length, LogLevel lvl){
         header.full_msg_size = msg_length + HEADERS_LENGTH;
@@ -68,7 +68,15 @@ namespace logging{
         }
         MsgHeader header;
         std::size_t msg_length = msg.length(); 
+
+        // In case program got logging message 
+        // longer than 246 bytes (not fitting 1B),
+        // it will send only 246 bytes
+        if (msg_length > 246){
+            msg_length = 246;
+        }
         fillMsgHeader(header, msg_length, lvl);
+        std::lock_guard<std::mutex> lg(mtx);
         if (send(fd_opt.value(), reinterpret_cast<const void*>(&header), HEADERS_LENGTH, TCP_VALUE) < EDGE_CASE){
             std::cerr << "Can't send logs' header to socket.\n";
             return;
