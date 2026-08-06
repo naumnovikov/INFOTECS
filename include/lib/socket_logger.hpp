@@ -6,7 +6,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <optional>
-#include <cstdint>
 #include "i_logger.hpp"
 
 namespace logging{
@@ -23,12 +22,13 @@ namespace logging{
             inline void setLevel(LogLevel lvl) override {
                 current_log_lvl = lvl;
             }
-            void log(std::string_view msg, LogLevel lvl) override;
+            ErrorCode log(std::string_view msg, LogLevel lvl) override;
+            ErrorCode init(IpType ip, PortType port, LogLevel default_level);
 
             //Don't forget to close socket
-            void closeSocket() {
+            void close() override{
                 if (fd_opt.has_value()){
-                    close(fd_opt.value());
+                    ::close(fd_opt.value());
                     fd_opt.reset();
                 }
             }
@@ -37,11 +37,33 @@ namespace logging{
             std::optional<FdType> fd_opt;
             std::mutex mtx;
 
-            SocketLogger(IpType ip, PortType port, LogLevel default_level);
-
             SocketLogger() = default;
             ~SocketLogger() = default;
     };
-}
+} // namespace logging
+
+namespace sl_api {
+    inline logging::ErrorCode debug(std::string_view msg) {
+        return logging::SocketLogger::getInstance().log(msg, logging::LogLevel::DEBUG);
+    }
+    inline logging::ErrorCode info(std::string_view msg) {
+        return logging::SocketLogger::getInstance().log(msg, logging::LogLevel::INFO);
+    }
+    inline logging::ErrorCode error(std::string_view msg) {
+        return logging::SocketLogger::getInstance().log(msg, logging::LogLevel::ERROR);
+    }
+    inline logging::ErrorCode log(std::string_view msg, logging::LogLevel level) {
+        return logging::SocketLogger::getInstance().log(msg, level);
+    }
+    inline void setLevel(logging::LogLevel level) {
+        logging::SocketLogger::getInstance().setLevel(level);
+    }
+    inline logging::ErrorCode init(logging::IpType ip, logging::PortType port, logging::LogLevel default_level) {
+        return logging::SocketLogger::getInstance().init(ip, port, default_level);
+    }
+    inline void close() {
+        logging::SocketLogger::getInstance().close();
+    }
+} // namespace sl_api
 
 #endif // SOCKET_LOGGER_HPP

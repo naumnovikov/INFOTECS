@@ -6,13 +6,21 @@
 #include <ctime>
 #include <atomic>
 #include <mutex>
+#include <cstdint>
 
 namespace logging{
-    enum class LogLevel{
+    using ErrorCode = unsigned;
+
+    // std::uint8_t covers all 6 basic
+    // levels of logging (debug, info,
+    // warn, error, fatal)
+    enum class LogLevel : std::uint8_t{
         DEBUG, 
         INFO, 
-        ERROR
+        ERROR,
+        COUNT_FIELD
     };
+    inline constexpr std::uint8_t LOGLVL_SIZE = COUNT_FIELD;
 
     inline const std::string_view turnLogLevelIntoString(LogLevel lvl){
         switch (lvl){
@@ -34,7 +42,11 @@ namespace logging{
                 return Derived::getInstance();
             }
             virtual inline void setLevel(LogLevel lvl) = 0;
-            virtual void log(std::string_view msg, LogLevel lvl) = 0;
+            virtual ErrorCode log(std::string_view msg, LogLevel lvl) = 0;
+
+            // Init function is up to child 
+            // because they differ
+            virtual void close() = 0;
 
             ILogger(ILogger const&) = delete;
             ILogger& operator= (ILogger const&) = delete;
@@ -42,6 +54,6 @@ namespace logging{
             ILogger() = default;
             ~ILogger() = default;
     };
-}
+} // namespace logging
 
 #endif // I_LOGGER_HPP

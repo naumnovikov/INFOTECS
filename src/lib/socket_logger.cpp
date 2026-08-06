@@ -6,20 +6,25 @@ namespace logging{
     inline constexpr int EDGE_CASE = 0;
     using Byte = std::uint8_t;
 
-    SocketLogger::SocketLogger(IpType ip, PortType port, LogLevel default_level){
+    // In case init wasn't used before logging,
+    // it just wouldn't log to socket because 
+    // !fd_opt.has_value() condition returns true
+    ErrorCode SocketLogger::init(IpType ip, PortType port, LogLevel default_level){
         struct sockaddr_in addr;
         fd_opt = socket(AF_INET, SOCK_STREAM, TCP_VALUE);
         if(fd_opt < EDGE_CASE){
             std::cerr << "Can't create a socket.\n";
-            return;
+            return 4;
         }
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
         addr.sin_addr.s_addr = htonl(ip);
         if(connect(fd_opt.value(), (struct sockaddr *)&addr, sizeof(addr)) < EDGE_CASE){
             std::cerr << "Can't connect.\n";
-            closeSocket();
+            close();
+            return 5;
         }
+        return 0;
     }
 
     inline constexpr int HEADERS_LENGTH = 9;
@@ -58,19 +63,19 @@ namespace logging{
         setLocalTime(header);
         header.log_lvl = static_cast<Byte>(lvl);
     }
-    void SocketLogger::log(std::string_view msg, LogLevel lvl){
+    ErrorCode SocketLogger::log(std::string_view msg, LogLevel lvl){
         if (!fd_opt.has_value()){
             std::cerr << "Socket is undefined.\n";
-            return;
+            return 1;
         }
         if (lvl < current_log_lvl){
-            return;
+            return 0;
         }
         MsgHeader header;
         std::size_t msg_length = msg.length(); 
 
         // In case program got logging message 
-        // longer than 246 bytes (not fitting 1B),
+        // longer than 246 bytes (not fitting 1B field),
         // it will send only 246 bytes
         if (msg_length > 246){
             msg_length = 246;
@@ -79,12 +84,14 @@ namespace logging{
         std::lock_guard<std::mutex> lg(mtx);
         if (send(fd_opt.value(), reinterpret_cast<const void*>(&header), HEADERS_LENGTH, TCP_VALUE) < EDGE_CASE){
             std::cerr << "Can't send logs' header to socket.\n";
-            return;
+            return 2;
         }
         if (!msg.empty()){
             if (send(fd_opt.value(), msg.data(), msg_length, TCP_VALUE) < EDGE_CASE){
                 std::cerr << "Can't send log to socket.\n";
             }
+            return 2;
         }
+        return 0;
     }
-}
+} // namespace logging
