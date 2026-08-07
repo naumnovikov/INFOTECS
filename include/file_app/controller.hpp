@@ -1,24 +1,27 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
-#include "worker.hpp"
-#include "file_logger.hpp"
+#include "business_worker.hpp"
 
-class Controller{
-    public:
-        Controller& getInstance(){
-            static Controller instance;
-            return instance; 
-        }
-        void interact();
+namespace controller_api{
+    class Controller{
+        public:
+            static Controller& getInstance(){
+                static Controller instance;
+                return instance; 
+            }
+            void interact();
 
-        Controller(Controller const&) = delete;
-        Controller& operator= (Controller const&) = delete;
-    private:
-        Worker worker;
+            Controller(Controller const&) = delete;
+            Controller& operator= (Controller const&) = delete;
+        private:
+            Controller() = default;
+            ~Controller() = default;
+    };
 
-        Controller() = default;
-        ~Controller() = default;
-};
+    inline void interact() {
+        Controller::getInstance().interact();
+    }
+} // namespace controller_api
 
 #endif // CONTROLLER_HPP

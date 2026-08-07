@@ -24,7 +24,7 @@ namespace logging{
                 }
             }
         private:
-            std::atomic<LogLevel> current_log_lvl = LogLevel::DEBUG;
+            LogLevel current_log_lvl = LogLevel::DEBUG;
             std::ofstream f_out;
             std::mutex mtx;
 

@@ -22,6 +22,14 @@ namespace logging{
     };
     inline constexpr std::uint8_t LOGLVL_SIZE = COUNT_FIELD;
 
+    ErrorCode checkLvl(std::int8_t lvl){
+        if (lvl >= LOGLVL_SIZE || lvl < 0){
+            std::cerr << "Wrong log level.\n";
+            return 3;
+        }
+        return 0;
+    }
+
     inline const std::string_view turnLogLevelIntoString(LogLevel lvl){
         switch (lvl){
             case LogLevel::DEBUG:
