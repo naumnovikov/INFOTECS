@@ -34,15 +34,6 @@ namespace logging{
 } // namespace logging
 
 namespace fl_api {
-    inline logging::ErrorCode debug(std::string_view msg) {
-        return logging::FileLogger::getInstance().log(msg, logging::LogLevel::DEBUG);
-    }
-    inline logging::ErrorCode info(std::string_view msg) {
-        return logging::FileLogger::getInstance().log(msg, logging::LogLevel::INFO);
-    }
-    inline logging::ErrorCode error(std::string_view msg) {
-        return logging::FileLogger::getInstance().log(msg, logging::LogLevel::ERROR);
-    }
     inline logging::ErrorCode log(std::string_view msg, logging::LogLevel level) {
         return logging::FileLogger::getInstance().log(msg, level);
     }

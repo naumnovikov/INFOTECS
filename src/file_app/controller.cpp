@@ -1,69 +1,51 @@
 #include "controller.hpp"
 #include <string>
 
+void controller_api::Controller::initCommands(business_worker::BusinessWorker& worker) {
+    commands["CHANGE"] = std::make_unique<menu::Change>();
+    commands["LOG"] = std::make_unique<menu::Log>(worker);
+    commands["HELP"] = std::make_unique<menu::Help>();
+    commands["EXIT"] = std::make_unique<menu::Exit>(worker);
+}
 void controller_api::Controller::interact(){
-    // TO DO:
-    // - рефакторинг 
-    std::cout << "------------Init a file logger------------\n";
-    std::int8_t lvl_input;
-    std::cout << "Input default log level: ";
-    std::cin >> lvl_input;
-    while (logging::checkLvl(lvl_input) != 0){
-        std::cerr << "Wrong input.\n";
-        std::cin >> lvl_input;
-    }
-    logging::LogLevel lvl = static_cast<logging::LogLevel>(static_cast<std::uint8_t>(lvl_input));
-    std::string filename;
-    std::cout << "Input filename for logging: ";
-    while (fl_api::init(filename, lvl) != 0){
-        std::cerr << "Wrong input.\n";
-        std::cin >> filename;
-    }
+    initFl();
     business_worker::BusinessWorker worker;
+    initCommands(worker);
+
+    // stub used here because HELP 
+    // doesn't need any arguments.
+    // It just sticks to menu interface.
+    std::vector<std::string> stub;
+    commands["HELP"]->execute(stub);
     while (true){
-        std::cout << "------------Commands------------\n";
-        std::cout << "1) changle default logging level;\n";
-        std::cout << "2) log;\n";
-        std::cout << "3) exit.\n";
-        std::cout << "--------------------------------\n";
-        std::cout << "Input type of command: ";
-        std::int8_t command_input;
-        std::cin >> command_input;
-        while (!std::cin || std::cin.peek() != '\n' || command_input < 1 || command_input > 3) {
-            std::cerr << "Wrong input.\n";
-            std::cin >> command_input;
+        std::cout << ">> ";
+        std::string command_input;
+        std::getline(std::cin, command_input);
+        while (command_input.empty()) {
+            std::cerr << "Empty input.\n";
+            std::getline(std::cin, command_input);
         }
-        switch (command_input){
-            case 1:{
-                std::int8_t lvl_input;
-                std::cout << "Input new default log level: ";
-                std::cin >> lvl_input;
-                while (logging::checkLvl(lvl_input) != 0){
-                    std::cerr << "Wrong input.\n";
-                    std::cin >> lvl_input;
-                }
-                fl_api::setLevel(static_cast<logging::LogLevel>(static_cast<std::uint8_t>(lvl_input)));
+        menu::Tokens tokens = collectInputCommand(std::move(command_input));
+        std::string command_argument = tokens[0];
+        menu::turnStringIntoUpper(command_argument);
+        if (command_argument == "CHANGE"){
+            if (tokens.size() == 1){
+                std::cout << "Too few arguments.\n";
+            }else{
+                commands["CHANGE"]->execute(tokens);
             }
-            case 2:{
-                // TO DO:
-                // - сделать возможным логирование без лвла
-                std::int8_t lvl_input;
-                std::cout << "Input log level: ";
-                std::cin >> lvl_input;
-                while (logging::checkLvl(lvl_input) != 0){
-                    std::cerr << "Wrong input.\n";
-                    std::cin >> lvl_input;
-                }
-                std::cout << "Input log message: ";
-                std::string msg;
-                std::getline(std::cin, msg);
-                worker.addTask([msg, lvl_input](){fl_api::log(msg, static_cast<logging::LogLevel>(static_cast<std::uint8_t>(lvl_input)));});
+        }else if (command_argument == "LOG"){
+            if (tokens.size() == 1){
+                std::cout << "Too few arguments.\n";
+            }else{
+                commands["LOG"]->execute(tokens);
             }
-            case 3:
-                std::cout << "Exiting...";
-                worker.stop();
-                fl_api::close();
-                break; 
+        }else if (command_argument == "HELP"){
+            commands["HELP"]->execute(stub);
+        }else if (command_argument == "EXIT"){
+            commands["EXIT"]->execute(stub);
+        }else{
+            std::cerr << "Unknown command.\n";
         }
     }
 }
