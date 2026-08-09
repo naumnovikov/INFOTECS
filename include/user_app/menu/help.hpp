@@ -3,11 +3,11 @@
 
 #include "menu.hpp"
 
-namespace menu{
+namespace menu {
 class Help : public Menu {
  public:
-  void execute(Tokens& tokens) override;
+  void execute(Tokens&) override;
 };
-} // namespace menu
+}  // namespace menu
 
 #endif  // HELP_HPP

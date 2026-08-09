@@ -3,13 +3,14 @@
 
 #include "menu.hpp"
 
-namespace menu{
+namespace menu {
 class Change : public Menu {
-    private:
-        logging::LogLevel parseInput(Tokens& tokens);
+ private:
+  static logging::LogLevel parseInput(const Tokens& tokens);
+
  public:
   void execute(Tokens& tokens) override;
 };
-} // namespace menu
+}  // namespace menu
 
 #endif  // CHANGE_HPP
