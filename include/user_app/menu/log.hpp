@@ -13,8 +13,7 @@ class Log : public Menu {
  private:
   BusinessWorker& worker;
 
-  static std::pair<msg, logging::LogLevel> parseInput(
-      const Tokens& tokens);
+  static std::pair<msg, logging::LogLevel> parseInput(const Tokens& tokens);
 };
 }  // namespace menu
 

@@ -6,8 +6,7 @@
 #include "user_controller.hpp"
 
 namespace menu {
-std::pair<msg, logging::LogLevel> Log::parseInput(
-    const Tokens& tokens) {
+std::pair<msg, logging::LogLevel> Log::parseInput(const Tokens& tokens) {
   if (tokens.size() < 2) {
     std::cout << "No message provided.\n";
     return {"", logging::LogLevel::DEBUG};
@@ -62,41 +61,42 @@ std::pair<msg, logging::LogLevel> Log::parseInput(
 // but log in socket only if availalbe
 // (Socket is available if user set [ip:port] on initialization stage)
 void Log::execute(Tokens& tokens) {
-    auto p = parseInput(tokens);
-    if (p.first.empty()) {
-        std::cout << "No message to log. Skipping.\n";
-        return;
-    }
+  auto p = parseInput(tokens);
+  if (p.first.empty()) {
+    std::cout << "No message to log. Skipping.\n";
+    return;
+  }
 
-    bool will_be_logged = false;
-    if (p.second >= fl_api::getLevel()) {
-        will_be_logged = true;
-    }
-    if (user_controller_api::socketAvailable() && p.second >= sl_api::getLevel()) {
-        will_be_logged = true;
-    }
+  bool will_be_logged = false;
+  if (p.second >= fl_api::getLevel()) {
+    will_be_logged = true;
+  }
+  if (user_controller_api::socketAvailable() &&
+      p.second >= sl_api::getLevel()) {
+    will_be_logged = true;
+  }
 
-    if (!will_be_logged) {
-        std::cout << "Message level is below current threshold. Skipped.\n";
-        return;
+  if (!will_be_logged) {
+    std::cout << "Message level is below current threshold. Skipped.\n";
+    return;
+  }
+
+  auto promise = std::make_shared<std::promise<logging::ErrorCode>>();
+  auto future = promise->get_future();
+
+  worker.addTask([p, promise]() {
+    auto ec = fl_api::log(p.first, p.second);
+    if (ec == 0 && user_controller_api::socketAvailable()) {
+      ec = sl_api::log(p.first, p.second);
     }
+    promise->set_value(ec);
+  });
 
-    auto promise = std::make_shared<std::promise<logging::ErrorCode>>();
-    auto future = promise->get_future();
-
-    worker.addTask([p, promise]() {
-        auto ec = fl_api::log(p.first, p.second);
-        if (ec == 0 && user_controller_api::socketAvailable()) {
-            ec = sl_api::log(p.first, p.second);
-        }
-        promise->set_value(ec);
-    });
-
-    logging::ErrorCode ec = future.get();
-    if (ec == 0) {
-        std::cout << "Message logged successfully.\n";
-    } else {
-        std::cerr << "Logging error (code " << ec << ").\n";
-    }
+  logging::ErrorCode ec = future.get();
+  if (ec == 0) {
+    std::cout << "Message logged successfully.\n";
+  } else {
+    std::cerr << "Logging error (code " << ec << ").\n";
+  }
 }
 }  // namespace menu

@@ -64,7 +64,8 @@ void Controller::work() {
   tv.tv_sec = TTL;
   tv.tv_usec = 0;
 
-  int sel_result = select(listen_fd.value() + 1, &accept_fds, nullptr, nullptr, &tv);
+  int sel_result =
+      select(listen_fd.value() + 1, &accept_fds, nullptr, nullptr, &tv);
 
   if (sel_result == 0) {
     std::cerr << "No connection within " << TTL << " seconds. Exiting.\n";
@@ -164,7 +165,7 @@ ErrorCode Controller::bindAndListen() noexcept {
   if (bind(listen_fd.value(), reinterpret_cast<struct sockaddr*>(&addr),
            sizeof(addr)) < EDGE_CASE) {
     std::cerr << "Bind failed\n";
-    closeListenSocket();   
+    closeListenSocket();
     return 6;
   }
 

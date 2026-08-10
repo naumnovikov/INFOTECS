@@ -58,7 +58,7 @@ inline logging::ErrorCode init(logging::IpType ip, logging::PortType port,
 }
 inline void close() { logging::SocketLogger::getInstance().close(); }
 inline logging::LogLevel getLevel() {
-    return logging::SocketLogger::getInstance().getLevel();
+  return logging::SocketLogger::getInstance().getLevel();
 }
 }  // namespace sl_api
 

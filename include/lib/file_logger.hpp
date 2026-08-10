@@ -48,7 +48,7 @@ inline logging::ErrorCode init(std::string_view filename,
 }
 inline void close() { logging::FileLogger::getInstance().close(); }
 inline logging::LogLevel getLevel() {
-    return logging::FileLogger::getInstance().getLevel();
+  return logging::FileLogger::getInstance().getLevel();
 }
 }  // namespace fl_api
 
