@@ -11,7 +11,8 @@ ErrorCode FileLogger::init(std::string_view filename, LogLevel default_level) {
   if (filename.empty()) {
     return 3;
   }
-  f_out.open(filename, std::ios::out | std::ios::app);
+  std::string filename_str(filename);
+  f_out.open(filename_str, std::ios::out | std::ios::app);
   if (!f_out) {
     return 3;
   }
