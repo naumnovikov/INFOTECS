@@ -9,12 +9,10 @@ namespace logging {
 // !f_out.is_open() returns true.
 ErrorCode FileLogger::init(std::string_view filename, LogLevel default_level) {
   if (filename.empty()) {
-    std::cerr << "Filename is empty.\n";
     return 3;
   }
-  f_out.open(filename, std::ios::out);
+  f_out.open(filename, std::ios::out | std::ios::app);
   if (!f_out) {
-    std::cerr << "Can't open a file.\n";
     return 3;
   }
   setLevel(default_level);
@@ -22,7 +20,6 @@ ErrorCode FileLogger::init(std::string_view filename, LogLevel default_level) {
 }
 ErrorCode FileLogger::log(std::string_view msg, LogLevel lvl) {
   if (!f_out.is_open()) {
-    std::cerr << "File is undefined.\n";
     return 1;
   }
   if (lvl < current_log_lvl) {

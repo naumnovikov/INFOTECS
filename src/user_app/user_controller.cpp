@@ -1,7 +1,5 @@
 #include "user_controller.hpp"
 
-#include <string>
-
 void user_controller::Controller::initCommands(
     business_worker::BusinessWorker& worker) {
   commands["CHANGE"] = std::make_unique<menu::Change>();
@@ -12,6 +10,10 @@ void user_controller::Controller::initCommands(
 void user_controller::Controller::interact() {
   business_worker::BusinessWorker worker;
   initCommands(worker);
+  if (commands.empty()) {
+    std::cerr << "No commands initialized. Exiting.\n";
+    return;
+  }
 
   // stub used here because HELP
   // doesn't need any arguments.
@@ -23,7 +25,7 @@ void user_controller::Controller::interact() {
     std::string command_input;
     std::getline(std::cin, command_input);
     while (command_input.empty()) {
-      std::cerr << "Empty input.\n";
+      std::cerr << "Empty input.\n>> ";
       std::getline(std::cin, command_input);
     }
     menu::Tokens tokens = collectInputCommand(std::move(command_input));

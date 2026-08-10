@@ -1,7 +1,5 @@
 #include "socket_logger.hpp"
 
-#include <vector>
-
 namespace logging {
 inline constexpr int TCP_VALUE = 0;
 inline constexpr int EDGE_CASE = 0;
@@ -13,15 +11,13 @@ ErrorCode SocketLogger::init(IpType ip, PortType port, LogLevel default_level) {
   struct sockaddr_in addr;
   fd_opt = socket(AF_INET, SOCK_STREAM, TCP_VALUE);
   if (!fd_opt.has_value() || (fd_opt.value() < EDGE_CASE)) {
-    std::cerr << "Can't create a socket.\n";
     return 4;
   }
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
-  addr.sin_addr.s_addr = htonl(ip);
+  addr.sin_addr.s_addr = ip;
   if (connect(fd_opt.value(), reinterpret_cast<struct sockaddr*>(&addr),
               sizeof(addr)) < EDGE_CASE) {
-    std::cerr << "Can't connect.\n";
     close();
     return 5;
   }
@@ -67,7 +63,6 @@ void fillMsgHeader(MsgHeader& header, std::size_t msg_length, LogLevel lvl) {
 }
 ErrorCode SocketLogger::log(std::string_view msg, LogLevel lvl) {
   if (!fd_opt.has_value()) {
-    std::cerr << "Socket is undefined.\n";
     return 1;
   }
   if (lvl < current_log_lvl) {
@@ -87,7 +82,6 @@ ErrorCode SocketLogger::log(std::string_view msg, LogLevel lvl) {
     ssize_t sent = send(fd_opt.value(), header_ptr + total_sent,
                         HEADERS_LENGTH - total_sent, TCP_VALUE);
     if (sent <= 0) {
-      std::cerr << "Can't send logs' header to socket.\n";
       return 2;
     }
     total_sent += sent;
@@ -99,7 +93,6 @@ ErrorCode SocketLogger::log(std::string_view msg, LogLevel lvl) {
       ssize_t sent = send(fd_opt.value(), body_ptr + total_sent,
                           msg_length - total_sent, TCP_VALUE);
       if (sent <= 0) {
-        std::cerr << "Can't send log to socket.\n";
         return 2;
       }
       total_sent += sent;

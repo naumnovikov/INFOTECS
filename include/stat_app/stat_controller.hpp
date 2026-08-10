@@ -40,6 +40,7 @@ class Controller {
   std::optional<PortType> port_opt;
   unsigned msgs_limit = 100;
   unsigned timeout_sec = 120;
+  unsigned TTL = 120;
 
   // In future program can listen more clients
   // and get statistics from them all if needed.

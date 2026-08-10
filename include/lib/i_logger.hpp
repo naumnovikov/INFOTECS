@@ -49,6 +49,7 @@ class ILogger {
   static Derived& getInstance() { return Derived::getInstance(); }
   virtual inline void setLevel(LogLevel lvl) = 0;
   virtual ErrorCode log(std::string_view msg, LogLevel lvl) = 0;
+  virtual inline LogLevel getLevel() const = 0;
 
   // Init function is up to child
   // because they differ.

@@ -4,7 +4,6 @@
 #include <condition_variable>
 #include <functional>
 #include <queue>
-#include <utility>
 
 #include "join_thread.hpp"
 

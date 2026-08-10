@@ -7,7 +7,6 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 
 namespace stat_controller {
 inline constexpr int TCP_VALUE = 0;
@@ -55,6 +54,27 @@ void Controller::work() {
   if (bindAndListen() != 0) {
     return;
   }
+  std::cout << "Waiting for connection...\n";
+
+  fd_set accept_fds;
+  FD_ZERO(&accept_fds);
+  FD_SET(listen_fd.value(), &accept_fds);
+
+  struct timeval tv;
+  tv.tv_sec = TTL;
+  tv.tv_usec = 0;
+
+  int sel_result = select(listen_fd.value() + 1, &accept_fds, nullptr, nullptr, &tv);
+
+  if (sel_result == 0) {
+    std::cerr << "No connection within " << TTL << " seconds. Exiting.\n";
+    closeListenSocket();
+    return;
+  } else if (sel_result < 0) {
+    std::cerr << "select error\n";
+    closeListenSocket();
+    return;
+  }
 
   struct sockaddr_in client_addr;
   socklen_t addr_len = sizeof(client_addr);
@@ -70,17 +90,17 @@ void Controller::work() {
   std::cout << "Connection accepted.\n";
 
   fd_set read_fds;
-  struct timeval tv;
+  struct timeval tv_read;
 
   while (true) {
     FD_ZERO(&read_fds);
     FD_SET(client_fd.value(), &read_fds);
 
-    tv.tv_sec = timeout_sec;
-    tv.tv_usec = 0;
+    tv_read.tv_sec = timeout_sec;
+    tv_read.tv_usec = 0;
 
     int select_result =
-        select(client_fd.value() + 1, &read_fds, nullptr, nullptr, &tv);
+        select(client_fd.value() + 1, &read_fds, nullptr, nullptr, &tv_read);
 
     if (select_result < EDGE_CASE) {
       std::cerr << "Select error\n";
@@ -144,7 +164,7 @@ ErrorCode Controller::bindAndListen() noexcept {
   if (bind(listen_fd.value(), reinterpret_cast<struct sockaddr*>(&addr),
            sizeof(addr)) < EDGE_CASE) {
     std::cerr << "Bind failed\n";
-    closeListenSocket();
+    closeListenSocket();   
     return 6;
   }
 

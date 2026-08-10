@@ -3,12 +3,12 @@
 
 #include <memory>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include "business_worker.hpp"
 #include "change.hpp"
 #include "exit.hpp"
-#include "file_logger.hpp"
 #include "help.hpp"
 #include "log.hpp"
 

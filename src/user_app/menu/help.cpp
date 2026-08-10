@@ -10,14 +10,19 @@ void Help::execute(Tokens&) {
   std::cout << "HELP - print this help;\n";
   std::cout << "EXIT - exit the program.\n";
   std::cout << "--------------------------------\n";
+  std::cout << "------------EXISTING LOGGING LEVELS------------\n";
+  std::cout << "0) DEBUG;\n";
+  std::cout << "1) INFO;\n";
+  std::cout << "2) ERROR.\n";
+  std::cout << "--------------------------------\n";
   std::cout << "------------HOW TO USE------------\n";
   std::cout << "Few things you need to know:\n";
   std::cout << "- command parser is case-insensitive;\n";
-  std::cout << "- extra arguments will be skipped;\n";
+  std::cout << "- extra arguments will be skipped (accept from LOG command);\n";
   std::cout << "- extra spaces will be skipped;\n";
-  std::cout << "- you can use LOG without specifying level (default: DEBUG).\n";
-  std::cout << "- message can be quoted (for multi-word messages) or unquoted "
-               "(single word).\n";
+  std::cout << "- you can use LOG without specifying level (default: DEBUG);\n";
+  std::cout << "- if file already exists, program continues writing there;\n";
+  std::cout << "- if file doesn't exist, program creates it.\n";
   std::cout << "\nPossible variants:\n";
   std::cout << "  LOG \"Your message here\" DEBUG\n";
   std::cout << "  LOG \"Your message here\"\n";

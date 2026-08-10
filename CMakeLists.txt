@@ -13,10 +13,30 @@ find_package(Threads REQUIRED)
 
 # Static by default. Use "cmake -B build -DBUILD_SHARED_LIBS=ON" to compile dynamic.
 option(BUILD_SHARED_LIBS "Build library as shared (dynamic)" OFF)
+option(BUILD_LIB        "Build library" OFF)
+option(BUILD_USER_APP   "Build user application" OFF)
+option(BUILD_STAT_APP   "Build statistics application" OFF)
+option(BUILD_TESTS      "Build tests" OFF)
 
-add_subdirectory(src/user_app)
-add_subdirectory(src/lib)
+if(BUILD_LIB)
+    add_subdirectory(src/lib)
+endif()
 
-add_subdirectory(src/stat_app)
-enable_testing()
-add_subdirectory(tests)
+if(BUILD_USER_APP)
+    add_subdirectory(src/user_app)
+endif()
+
+if(BUILD_STAT_APP)
+    add_subdirectory(src/stat_app)
+endif()
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
+if(BUILD_USER_APP OR BUILD_TESTS)
+    if(NOT BUILD_LIB)
+        message(FATAL_ERROR "BUILD_LIB must be enabled for user application or tests")
+    endif()
+endif()

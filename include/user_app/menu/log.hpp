@@ -14,7 +14,7 @@ class Log : public Menu {
   BusinessWorker& worker;
 
   static std::pair<msg, logging::LogLevel> parseInput(
-      const Tokens& tokens) noexcept;
+      const Tokens& tokens);
 };
 }  // namespace menu
 

@@ -1,10 +1,5 @@
 #include <arpa/inet.h>
 
-#include <cctype>
-#include <cstdlib>
-#include <string>
-
-#include "socket_logger.hpp"
 #include "user_controller.hpp"
 
 namespace UA_cli {
@@ -68,6 +63,7 @@ int main(int argc, const char* argv[]) {
     ec = sl_api::init(ip_int, static_cast<uint16_t>(port), default_lvl);
     if (ec == 0) {
       user_controller_api::setSocketAvailable(true);
+      std::cout << "Socket logger initialized on " << ip << ":" << port << "\n";
     } else {
       std::cerr << "Failed to init socket logger. Error code: " << ec << "\n";
     }

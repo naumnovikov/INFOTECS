@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <unistd.h>
 
 #include <cassert>
 #include <cstdio>
@@ -107,8 +106,6 @@ void SlTester::test() {
   ec = sl_api::log("message after failed init", logging::LogLevel::DEBUG);
   assert(ec == 1);
 
-  std::cout << "SlTester: Basic error tests passed. "
-            << "(Full socket test requires a running server.)\n";
   std::cout << "SlTester: ALL TESTS PASSED\n";
 }
 

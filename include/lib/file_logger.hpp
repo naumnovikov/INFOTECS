@@ -15,6 +15,7 @@ class FileLogger : public ILogger<FileLogger> {
   inline void setLevel(LogLevel lvl) override { current_log_lvl = lvl; }
   ErrorCode log(std::string_view msg, LogLevel lvl) override;
   ErrorCode init(std::string_view filename, LogLevel default_level);
+  inline LogLevel getLevel() const override { return current_log_lvl.load(); }
 
   // Don't forget to close file.
   void close() override {
@@ -46,6 +47,9 @@ inline logging::ErrorCode init(std::string_view filename,
   return logging::FileLogger::getInstance().init(filename, default_level);
 }
 inline void close() { logging::FileLogger::getInstance().close(); }
+inline logging::LogLevel getLevel() {
+    return logging::FileLogger::getInstance().getLevel();
+}
 }  // namespace fl_api
 
 #endif  // FILE_LOGGER_HPP

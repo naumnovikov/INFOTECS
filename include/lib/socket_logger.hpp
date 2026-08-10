@@ -24,6 +24,7 @@ class SocketLogger : public ILogger<SocketLogger> {
   inline void setLevel(LogLevel lvl) override { current_log_lvl = lvl; }
   ErrorCode log(std::string_view msg, LogLevel lvl) override;
   ErrorCode init(IpType ip, PortType port, LogLevel default_level);
+  inline LogLevel getLevel() const override { return current_log_lvl.load(); }
 
   // Don't forget to close socket.
   void close() override {
@@ -56,6 +57,9 @@ inline logging::ErrorCode init(logging::IpType ip, logging::PortType port,
   return logging::SocketLogger::getInstance().init(ip, port, default_level);
 }
 inline void close() { logging::SocketLogger::getInstance().close(); }
+inline logging::LogLevel getLevel() {
+    return logging::SocketLogger::getInstance().getLevel();
+}
 }  // namespace sl_api
 
 #endif  // SOCKET_LOGGER_HPP

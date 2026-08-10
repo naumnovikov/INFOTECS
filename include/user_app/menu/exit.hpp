@@ -17,6 +17,7 @@ class Exit : public Menu {
     worker.stop();
     worker.manualJoin();
     fl_api::close();
+    sl_api::close();
   }
 };
 }  // namespace menu
