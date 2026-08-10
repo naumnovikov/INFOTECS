@@ -131,7 +131,7 @@ git clone -b main https://github.com/naumnovikov/INFOTECS.git
 cd INFOTECS
 mkdir build && cd build
 cmake .. -DBUILD_STAT_APP=ON
-make stat_app
+make SA
 ```
 **NB**: конфигурация SA происходит прямо в командной строке. Общий формат запуска:
 ```bash
