@@ -1,9 +1,11 @@
 #ifndef BUSINESS_WORKER_HPP
 #define BUSINESS_WORKER_HPP
 
+#include <queue>
+#include <utility>
 #include <condition_variable>
 #include <functional>
-#include <queue>
+#include <atomic> 
 
 #include "join_thread.hpp"
 
