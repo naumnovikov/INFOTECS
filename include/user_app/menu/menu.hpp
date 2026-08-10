@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "business_worker.hpp"
 #include "file_logger.hpp"
